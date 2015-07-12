@@ -1,34 +1,40 @@
+var staus = function(response) {
+  if (response.status >= 200 && response.status < 300) {
+    return Promise.resolve(response)
+  } else {
+    return Promise.reject(new Error(response.statusText))
+  }
+};
+
+var json = function(response) {
+  return response.json()
+};
+
 var CommentBox = React.createClass({
-  getInitialState: function(){
+  getInitialState: function() {
     return {data: []}
   },
   loadCommentsFromServer: function() {
-    $.ajax({
-      url: this.props.url,
-      dataType: 'json',
-      cache: false,
-      success: function(data) {
-        this.setState({data: data});
-      }.bind(this),
-      error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
-      }.bind(this)
-    });
+    var self = this;
+    fetch(this.props.url)
+      .then(status)
+      .then(json)
+      .then(function(comments) {
+        self.setState({data: comments})
+      })
   },
-  handleCommentSubmit: function (comment) {
-    $.ajax({
-      url: this.props.url,
-      dataType: 'json',
-      type: 'POST',
-      data: {comment: comment},
-      success: function(comment) {
-        this.state.data.push(comment);
-        this.setState({data: this.state.data});
-      }.bind(this),
-      error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
-      }.bind(this)
-    });
+  handleCommentSubmit: function(comment) {
+    var self = this;
+    fetch(this.props.url, {
+      method: 'POST',
+      body: JSON.stringify(comment)
+    })
+      .then(status)
+      .then(json)
+      .then(function(comment) {
+        self.state.data.push(comment);
+        self.setState({data: self.state.data});
+      });
   },
   componentDidMount: function() {
     this.loadCommentsFromServer();
@@ -45,7 +51,7 @@ var CommentBox = React.createClass({
 
 var CommentList = React.createClass({
   render: function() {
-    var commentNodes = this.props.data.map(function(comment){
+    var commentNodes = this.props.data.map(function(comment) {
       return <Comment author={comment.author}>
         {comment.text}
       </Comment>
@@ -60,13 +66,12 @@ var CommentList = React.createClass({
 
 var Comment = React.createClass({
   render: function() {
-    var rawMarkup = marked(this.props.children.toString(), {sanitize: true});
     return (
       <div className="comment">
         <h2 className="commentAuthor">
           {this.props.author}
         </h2>
-        <span dangerouslySetInnerHTML={{__html: rawMarkup}}/>
+        {this.props.children}
       </div>
     );
   }

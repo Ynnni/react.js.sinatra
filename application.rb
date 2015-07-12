@@ -9,6 +9,10 @@ class Reactive < Sinatra::Base
     def comment
       @comment ||= Comment.find(params[:id]) rescue halt(404)
     end
+
+    def data
+      @data ||= JSON.parse request.body.read
+    end
   end
 
   get '/' do
@@ -22,7 +26,7 @@ class Reactive < Sinatra::Base
 
   post '/comments' do
     content_type :json
-    comment = Comment.new params[:comment]
+    comment = Comment.new data
     comment.save!
     comment.to_json
   end
@@ -34,7 +38,7 @@ class Reactive < Sinatra::Base
 
   patch '/comments/:id' do
     content_type :json
-    comment.update! params[:comment]
+    comment.update! data
     comment.to_json
   end
 
