@@ -16,7 +16,11 @@ var CommentBox = React.createClass({
   },
   loadCommentsFromServer: function() {
     var self = this;
-    fetch(this.props.url)
+    fetch(this.props.url, {
+      headers: {
+        Accept: 'application/json'
+      }
+    })
       .then(status)
       .then(json)
       .then(function(comments) {
@@ -26,6 +30,9 @@ var CommentBox = React.createClass({
   handleCommentSubmit: function(comment) {
     var self = this;
     fetch(this.props.url, {
+      headers: {
+        Accept: 'application/json'
+      },
       method: 'POST',
       body: JSON.stringify(comment)
     })

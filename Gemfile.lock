@@ -60,3 +60,6 @@ DEPENDENCIES
   pry
   sinatra
   thin
+
+BUNDLED WITH
+   1.10.5

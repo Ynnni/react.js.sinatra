@@ -19,31 +19,27 @@ class Reactive < Sinatra::Base
     erb :index
   end
 
-  get '/comments' do
-    content_type :json
-    Comment.all.to_json
+  get '/comments', provides: :json do
+    comment = Comment.all
+    comment.to_json
   end
 
-  post '/comments' do
-    content_type :json
+  post '/comments', provides: :json do
     comment = Comment.new data
     comment.save!
     comment.to_json
   end
 
-  get '/comments/:id' do
-    content_type :json
+  get '/comments/:id', provides: :json do
     comment.to_json
   end
 
-  patch '/comments/:id' do
-    content_type :json
+  patch '/comments/:id', provides: :json do
     comment.update! data
     comment.to_json
   end
 
-  delete '/comments/:id' do
-    content_type :json
+  delete '/comments/:id', provides: :json do
     comment.delete
   end
 end
